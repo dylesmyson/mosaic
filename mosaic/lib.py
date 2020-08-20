@@ -22,7 +22,7 @@ Matrix     = List[Vector]
 
 # In general, a Matrix can have any dimensions which are a partition of the
 # number of elements of the Matrx. A Matrix with 36 elements, for example, can
-# have dimensions (6, 6), (9, 4), # (12, 3), and (18, 2)-- plus, their inverses.
+# have dimensions (6, 6), (9, 4), (12, 3), and (18, 2)-- plus, their inverses.
 Dimensions = Tuple[int, int]
 
 # For simplicity and ease-of-caclulation, a Matrix's elements are simply a
@@ -34,7 +34,7 @@ Dimensions = Tuple[int, int]
 # for our puzzle elements, such as musical notes, alpha-numeric characters, or
 # any other Hashable types. In Python, each numerical index of the Matrix maps
 # to a string value which can be overlayed at will later
-# (see `pretty_print` function).
+# (see `pretty` function).
 Values     = Dict[int, str]
 
 Operations = Dict[str, Callable]
