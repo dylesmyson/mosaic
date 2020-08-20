@@ -5,7 +5,7 @@
 After cloning the repository and cofiguring your DAW or synth (or anything that
 responds to midi), run
 
-        $ python3 -i connect.py
+        $ python3 -i bin/connect
 
 to begin the interactive connection.
 
@@ -58,7 +58,7 @@ class MidiController(builtins.object)
 
 ## Puzzle
 
-        $ python3 -i puzzle
+        $ python3 -i bin/puzzle mosaic/yml/puzzle/3x3.yml 3 0
 
 ```
 Initial state:
