@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+
+
+from sys import argv
+from mosaic.lib import play
+
+
+
+if __name__ == '__main__':
+    filepath = str(argv[1])
+    ctrl     = play(filepath)
+    print(f"Call `help(ctrl)` for help.")

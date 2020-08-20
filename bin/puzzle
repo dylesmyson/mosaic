@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+
+
+from sys import argv
+from time import sleep
+from random import choice
+from mosaic.lib import *
+
+
+if __name__ == '__main__':
+
+    """ Accepts a filename whose content configures the puzzle.
+    """
+
+    filepath = str(argv[1])
+    repeat   = int(argv[2])
+    delay    = int(argv[3])
+
+    initial, values = load_puzzle_from_file(filepath)
+
+    # DEMO APPLICATION
+    puzzle   = initial
+    sequence = random_sequence(repeat)
+
+    print(f"Initial state:\n{pretty(puzzle, values)}")
+
+    for operation in sequence:
+        print(f"Executing: {operation}")
+        sleep(delay)
+
+        previous = puzzle
+
+        puzzle   = compose(operations()[operation])(puzzle)
+
+        print(f"from previous: {similarity(previous, puzzle)}")
+        print(pretty(puzzle, values))
+
+    print(f"overall: {similarity(initial, puzzle)}")

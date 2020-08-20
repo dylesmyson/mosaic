@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+
+
+from mosaic.lib import connect
+
+
+
+if __name__ == '__main__':
+    ctrl = connect()
+    print(f"Call `help(ctrl)` for help.")

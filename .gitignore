@@ -1,0 +1,9 @@
+# Ignore IDE cruft
+.vscode/
+
+# Ignore Midi binary examples
+mosaic/mid/
+
+# Ignore Python cruft
+mosaic/__pycache__/
+mosaic.egg-info/

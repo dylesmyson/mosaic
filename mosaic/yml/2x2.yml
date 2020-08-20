@@ -1,0 +1,38 @@
+data:
+  pitch:
+    initial: 62
+
+    dimensions: [ 2, 2 ]
+
+    states:
+      values: [ 60, 62 ]
+
+    transition:
+      values: [ 1.00, 0.00, 0.50, 0.50 ]
+
+  rhythm:
+    initial: 0.25
+
+    dimensions: [ 3, 3 ]
+
+    states:
+      values: [ 0.25, 0.5, 2.06250 ]
+
+    transition:
+      values: [ 0.60, 0.20, 0.20,
+                1.00, 0.00, 0.00,
+                1.00, 0.00, 0.00 ]
+
+  veloc:
+    initial: 50
+
+    dimensions: [ 4, 4 ]
+
+    states:
+      values: [ 40, 50, 75, 90 ]
+
+    transition:
+      values: [ 0.25, 0.25, 0.25, 0.25,
+                0.25, 0.25, 0.25, 0.25,
+                0.25, 0.25, 0.25, 0.25,
+                0.25, 0.25, 0.25, 0.25 ]
