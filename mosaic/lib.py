@@ -20,27 +20,21 @@ from mido import open_output, MidiFile
 Vector     = List[int]
 Matrix     = List[Vector]
 
-# In general, a Matrix can have any dimensions
-# which are a partition of the number of elements
-# of the Matrx.
-# A Matrix with 36 elements, for example,
-# can have dimensions (6, 6), (9, 4),
-# (12, 3), and (18, 2)-- plus, their inverses.
+# In general, a Matrix can have any dimensions which are a partition of the
+# number of elements of the Matrx. A Matrix with 36 elements, for example, can
+# have dimensions (6, 6), (9, 4), # (12, 3), and (18, 2)-- plus, their inverses.
 Dimensions = Tuple[int, int]
 
-# For simplicity and ease-of-caclulation,
-# a Matrix's elements are simply a range of
-# numbers up to the size of the Matrix. E.g.,
+# For simplicity and ease-of-caclulation, a Matrix's elements are simply a
+# range of numbers up to the size of the Matrix. E.g.,
 #   [ [0, 1, 2],
 #     [3, 4, 5],
 #     [6, 7, 8] ]
-# Howvever, in the context of the Matrix as
-# a puzzle, the Matrix should encode for our 
-# puzzle elements, such as musical notes,
-# alpha-numeric characters, or any other Hashable
-# types. In Python, each numerical index of the
-# Matrix maps to a string value which can be overlayed
-# at will later (see `pretty_print` function).
+# Howvever, in the context of the Matrix as a puzzle, the Matrix should encode
+# for our puzzle elements, such as musical notes, alpha-numeric characters, or
+# any other Hashable types. In Python, each numerical index of the Matrix maps
+# to a string value which can be overlayed at will later
+# (see `pretty_print` function).
 Values     = Dict[int, str]
 
 Operations = Dict[str, Callable]
@@ -51,7 +45,7 @@ Puzzle     = Tuple[Matrix, Values]
 
 # Methods on Vectors
 def element_lengths_equal(vector: Vector, dimensions: Dimensions) -> bool:
-    return reduce(lambda x,y: x*y, dimensions, 1) == len(vector)
+    return prod(dimensions) == len(vector)
 
 def to_matrix(dimensions: Dimensions, vector: Vector) -> Matrix:
 
@@ -60,24 +54,24 @@ def to_matrix(dimensions: Dimensions, vector: Vector) -> Matrix:
     For example, this can convert a (row) vector of size 4 into any matrix
     with dimensions that are a partition of 4, which is 2x2 or 4x1 (or 1x4).
     By convention, the incoming vector is a row vector, or in another words,
-    dimensions x > y.
-    >>> to_matrix( [1, 2, 3, 4], (2,2) )
+    dimensions x >= y.
+    >>> to_matrix([1,2,3,4], (2,2))
     [[1, 2], [3, 4]]
 
     This can be used to convert a row vector into a column vector by simply
     reversing the dimensions. For example,
-    >>> to_matrix([1, 2, 3, 4], (1,4))
+    >>> to_matrix([1,2,3,4], (1,4))
     [[1], [2], [3], [4]]
     """
 
     if not element_lengths_equal(vector, dimensions):
         raise RuntimeError
 
-    dimensional_span: int = min(dimensions)
+    x_span: int = dimensions[0]
 
     resultant: Matrix = []
-    for index in range(0, prod(dimensions), dimensional_span):
-        resultant.append(vector[index:index+dimensional_span])
+    for index in range(0, prod(dimensions), x_span):
+        resultant.append(vector[index:index+x_span])
 
     return resultant
 
@@ -96,10 +90,9 @@ def to_vector(matrix: Matrix) -> Vector:
 
     """ Converts matrix into a row vector.
 
-    For example, this will convert a 2x2 matrix--or a list of two nested
-    lists-- into a 4x1 row vector.
+    For example, this will convert a 2x2 Matrix into a 4x1 Vector.
 
-    >>> decompose([[1,2], [3,4]])
+    >>> to_vector([[1,2], [3,4]])
     [1, 2, 3, 4]
     """
 
@@ -171,7 +164,7 @@ def compose(*functions: Callable) -> Any:
         >>> compose(g,g,g,g)(1)
         16
 
-        However, this can be written much more cryptically and succinctly
+        This can be written much more succinctly but cryptically like
         >>> compose(*4*[g])(1)
         16
 
@@ -181,7 +174,6 @@ def compose(*functions: Callable) -> Any:
         9
     """
 
-    # return reduce(lambda f,g: lambda x: f(g(x)), functions, lambda x: x)
     return reduce(lambda f,g: lambda x: f(g(x)), functions, lambda x: x)
 
 def operations() -> Operations:
@@ -376,9 +368,3 @@ def messages(filepath: str) -> Any:
     for _, track in enumerate(midifile.tracks):
         for msg in track:
             yield msg
-
-
-
-if __name__ == '__main__':
-    puzzle = PuzzleSpace('mosaic/yml/puzzle.2x2.yml')
-    puzzle.apply(['@'])
