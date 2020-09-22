@@ -2,10 +2,18 @@
 
 
 
+from sys import argv
+
 from mosaic.lib import connect
 
 
 
 if __name__ == '__main__':
-    ctrl = connect()
-    print(f"Call `help(ctrl)` for help.")
+
+    name = argv[1] if len(argv) > 1 else None
+
+    # `connect` will attempt to establish a **MIDI** connection
+    session = connect(name) if name else connect()
+
+    print("Session connected!")
+    print("Call `help(session)` for help.")

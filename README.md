@@ -1,88 +1,75 @@
-# Installation and Usage
+# **MIDI** Mosaics in Python
 
-## Connect
+A mosaic is a sort of cellular arrangement of (not necessarily) distinct
+pieces. The goal of this library is to facilitate the arrangement of musical
+notation (or other well-defined behavior) into various mathematical
+objects.
 
-After cloning the repository and cofiguring your DAW or synth (or anything that
-responds to midi), run
+To accomplish this, **Mosaic** implements two features. The first is a wrapper
+around a **MIDI** file player implementation. A library like **RTMidi** for
+example is used. This wrapper maintains the state of a "session", offering many
+playback and performance, as well as scripting opportunities.
 
-        $ python3 -i bin/connect
-
-to begin the interactive connection.
-
-* call `help` on any method or class for its docstring. *
-
-in particular, `help(ctrl)` is a good starting point:
-
-```
-connect as pycon
-<lib.midi.MidiController object at 0x103d2ce10>
-Help on MidiController in module lib.midi object:
-
-class MidiController(builtins.object)
- |  MidiController(connector)
- |
- |  Methods defined here:
- |
- |  __init__(self, connector)
- |      Initialize self.  See help(type(self)) for accurate signature.
- |
- |  all_off(self)
- |      stop all notes.
- |
- |  dump_history(self, filename=None)
- |      clears and potentially saves the note history.
- |
- |  history(self)
- |      ouputs the history of note events.
- |
- |  play(self, pitch=60, rhythm=3.0, veloc=64)
- |      play a note corresponding to pitch, rhythm, and velocity.
- |
- |  replay(self, filename)
- |      play back the pitch, rhythm, and velocity data from a file.
- |
- |  test_connection(self)
- |      play one note forever to test midi connection. ctrl-c to quit.
- |
- |  ----------------------------------------------------------------------
- |  Data descriptors defined here:
- |
- |  __dict__
- |      dictionary for instance variables (if defined)
- |
- |  __weakref__
- |      list of weak references to the object (if defined)
+The second is a set of **Midi** file-generation algorithms. These algorithms
+can take a given initial state and parameters and output a valid **MIDI** file,
+which is also capable of being orchestrated by the wrapper.
 
 
-```
+## Getting Started
 
-## Puzzle
+After cloning the repository, run
 
-        $ python3 -i bin/puzzle mosaic/yml/puzzle/3x3.yml 3 0
+        $ pip3 install -r requirements
 
-```
-Initial state:
-C_4 C_3 E_4
-G_4 A_3 A_4
-B_4 D_4 F_4
+to install the package dependencies. Next, install the package
 
-Executing: ~
-from previous: 0.6666666666666666
-C_3 E_4 C_4
-G_4 A_3 A_4
-B_4 D_4 F_4
+        $ pip3 install -e .
 
-Executing: @
-from previous: 0.1111111111111111
-C_4 A_4 F_4
-E_4 A_3 D_4
-C_3 G_4 B_4
+### Midi
 
-Executing: @
-from previous: 0.1111111111111111
-F_4 D_4 B_4
-A_4 A_3 G_4
-C_4 E_4 C_3
+Setting up **MIDI** can involve careful trouble-shooting, and this implementation
+has only been tested with __my__ setup, but in general, you'll want to connect
+your devices which are capable of __receiving__ **MIDI** messages to whatever
+hardware will use this library.
 
-overall: 0.1111111111111111
-```
+For example, I like to connect to a DAW, since it will usually provide a lot
+of sound choices, as well as many secondary musical tools-- not to mention,
+**MIDI** debug tooling.
+
+
+## Available Scripts
+
+### Connect
+
+Allows you to quickly connect to and interact with a **MIDI** receiver-- very
+useful for debugging a connection.
+
+#### Usage
+
+        $ python3 -i bin/connect [CONNECTION NAME]
+
+to begin the __interactive__ connection.
+
+If `CONNECTION NAME` isn't given, it defaults to `mosaic`.
+
+At any time you may use the built-in `help` function from **Python** to see the
+documentation for an object.
+
+When `connect` is run, it creates a `SessionController` object named `session`.
+Call `help` on this object for API documentation:
+
+        >>> help(session)
+
+### Player
+
+Another useful tool is the **MIDI** file player. It allows you to play most
+`.*.mid` files through your receiver. Very fun to play around with and
+experiment with!
+
+#### Usage
+
+        $ python3 [-i] bin/player [MIDI FILE]
+
+By appending the `-i`, you will tell the script to "leave the session open".
+Together with the API functionality of the underlying session, it's possible
+to dump the MIDI data which is great for debugging/editing songs.
