@@ -204,14 +204,10 @@ class MidiController:
         ON = 0x90
         OFF = 0x80
 
-    def __init__(self, connector: Optional['MidiConnector'] = None) -> 'MidiController':
+    def __init__(self, connector: 'MidiConnector') -> 'MidiController':
         self.__history: list = []
         self.__active_notes: list = []
-
-        if connector:
-            self.__connector = connector
-        else:
-            self.__connector = MidiConnector('pycon')
+        self.__connector: 'MidiConnector' = connector
 
     def __wait_real_time(self, seconds: float) -> None:
         sleep(seconds)
@@ -283,8 +279,8 @@ class MidiController:
                 pitch, rhythm, veloc = line.split(',')
                 self.play(int(pitch), float(rhythm), int(veloc))
 
-def connect() -> 'MidiController':
-    return MidiController()
+def connect(name: Optional[str] = 'mosaic') -> 'MidiController':
+    return MidiController(connector = MidiConnector(name = name))
 
 
 # Mathematical Methods
