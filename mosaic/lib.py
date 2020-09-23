@@ -2,17 +2,22 @@
 
 
 
-from math import prod
+import time
+
 from enum import Enum
-from time import sleep
+from math import prod
 from pathlib import Path
 from yaml import safe_load
-from random import choice, choices
-from functools import reduce
+# from functools import reduce
 from itertools import product
+from random import choice, choices
+
 from typing import List, Tuple, Dict, Callable, Any, Optional
 
-from mido import open_output, MidiFile
+from rtmidi.midiutil import open_midioutput, open_midiinput
+from rtmidi.midiconstants import NOTE_OFF, NOTE_ON
+
+from mido import open_output, MidiFile, MidiTrack
 
 
 
@@ -210,7 +215,7 @@ class MidiController:
         self.__connector: 'MidiConnector' = connector
 
     def __wait_real_time(self, seconds: float) -> None:
-        sleep(seconds)
+        time.sleep(seconds)
 
     def __send_msg(self, parity: NoteState, pitch: int, veloc: int) -> None:
         if parity is self.NoteState.ON:
@@ -279,8 +284,8 @@ class MidiController:
                 pitch, rhythm, veloc = line.split(',')
                 self.play(int(pitch), float(rhythm), int(veloc))
 
-def connect(name: Optional[str] = 'mosaic') -> 'MidiController':
-    return MidiController(connector = MidiConnector(name = name))
+# def connect(name: Optional[str] = 'mosaic') -> 'MidiController':
+#     return MidiController(connector = MidiConnector(name = name))
 
 
 # Mathematical Methods
@@ -352,11 +357,12 @@ def average_similarity(initial: Matrix, length: int, trials: int) -> float:
 ## Midi
 def play(filepath: str, controller: Optional['MidiController'] = None) -> 'MidiController':
     if not controller:
-        controller = connect()
+        controller = connect('player')
     midifile = load_midi_file(filepath)
-    sleep(1)
+    print(f"playing {filepath}")
+    time.sleep(1)
     for msg in midifile.play():
-        controller.send(msg)
+        controller.send(msg) if controller else print(f"controller not found")
     return controller
 
 def messages(filepath: str) -> Any:
@@ -364,3 +370,73 @@ def messages(filepath: str) -> Any:
     for _, track in enumerate(midifile.tracks):
         for msg in track:
             yield msg
+
+
+
+
+def write_midi_file(tracks: List, name: str = 'out.mid'):
+    midi_file = MidiFile()
+
+    for track in tracks:
+        midi_track = MidiTrack()
+        midi_file.tracks.append(midi_track)
+        for message in track:
+            midi_track.append(message)
+    return midi_file.save(name)
+
+
+
+# Prompts user for MIDI input port, unless a valid port number or name
+# is given as the first argument on the command line.
+# API backend defaults to ALSA on Linux.
+def connect(name):
+    output_conf = { 'port_name': name, 'use_virtual': True }
+    try:
+        midiout, port_name = open_midioutput(**output_conf)
+    except (EOFError, KeyboardInterrupt):
+        sys.exit()
+
+    note_on = [NOTE_ON, 60, 112]  # channel 1, middle C, velocity 112
+    note_off = [NOTE_OFF, 60, 0]
+
+    time.sleep(2)
+    # input('')
+
+    with midiout:
+        print(f"Sending NoteOn event on port name {port_name}.")
+        midiout.send_message(note_on)
+        time.sleep(1)
+        print(f"Sending NoteOff event on port name {port_name}.")
+        midiout.send_message(note_off)
+        time.sleep(0.1)
+
+    del midiout
+    print("Exit.")
+
+
+
+def poll(name: str = 'receiver'):
+    input_conf = { 'port': None, 'port_name': name, 'use_virtual': True }
+    try:
+        midiin, port_name = open_midiinput(**input_conf)
+    except(EOFError, KeyboardInterrupt):
+        sys.exit()
+
+    print("Entering main loop. Press Control-C to exit.")
+    try:
+        timer = time.time()
+        while True:
+            msg = midiin.get_message()
+
+            if msg:
+                message, deltatime = msg
+                timer += deltatime
+                print("[%s] @%0.6f %r" % (port_name, timer, message))
+
+            time.sleep(0.01)
+    except KeyboardInterrupt:
+        print('')
+    finally:
+        print("Exit.")
+        midiin.close_port()
+        del midiin
