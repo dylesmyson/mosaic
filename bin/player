@@ -3,16 +3,18 @@
 
 
 from sys import argv
+from pathlib import Path
 
-from mosaic.lib import play
+from mosaic.lib import *
 
 
 
 if __name__ == '__main__':
+    filepathstr = str(argv[1]) if len(argv) > 1 else 'mosaic/example/mid/foo.mid'
+    filepath    = Path(filepathstr)
 
-    filepath = str(argv[1]) if len(argv) > 1 else 'mosaic/example/mid/foo.mid'
-
-    session  = play(filepath)
-
+    session  = Session(filepath)
     print("Session connected!")
+    session.play()
+
     print("Call `help(session)` for help.")
