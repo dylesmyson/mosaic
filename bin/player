@@ -13,6 +13,7 @@ if __name__ == '__main__':
 
     session  = Session()
     print("Session connected!")
-    session.play(filepathstr)
+    session.load(filepathstr)
+    session.play()
 
     print("Call `help(session)` for help.")
