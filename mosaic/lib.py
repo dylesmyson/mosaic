@@ -76,35 +76,26 @@ class Session:
         """
 
         with MidiFile(debug=True) as midifile:
-            [ midifile.tracks.append(track) for track in data ]
+            track = MidiTrack()
+            array_bytes = [ msg.bin() for msg in data ]
+            [ track.append(byte) for byte in array_bytes ]
+            midifile.tracks.append(track)
             midifile.save(filename=filepathstr)
 
-    def step(self, start=0, stop=0, step=1):
-        messages = islice(self.__message_generator(), start, stop, step)
-        for msg in messages:
-            time.sleep(msg.time)
-            self.__send_message(msg)
+    def step(self, start, stop, step, verbose=False):
+        generator = self.__message_generator()
+        messages  = islice(generator, start, stop, step)
+        self.__play_messages(messages, verbose)
 
-    def play(self):
-        for msg in self.midifile.play():
-            time.sleep(msg.time)
-            self.__send_message(msg)
+    def play(self, verbose=False):
+        self.step(0, None, step=1, verbose=verbose)
 
-    def loop(self):
+    def loop(self, verbose=False):
         while True:
             try:
                 t0 = time.time()
-                self.play()
+                self.play(verbose=verbose)
                 print(f"looped in {time.time()-t0}s (expected {self.midifile.length})")
             except KeyboardInterrupt:
                 self.outport.reset()
                 break
-
-
-
-#     def dump_history(self, filename):
-#         if filename:
-#             track = MidiTrack()
-#             [ track.append(msg) for msg in self.history ]
-#         self.history = []
-
