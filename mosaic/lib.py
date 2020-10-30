@@ -22,6 +22,8 @@ class Session:
         self.midifile = None
         self.outport  = self.__connect_midi_in(name)
 
+
+
     def __connect_midi_in(self, name: str) -> 'BaseMidiOut':
 
         """ Return BaseOutput class.
@@ -29,7 +31,7 @@ class Session:
 
         return open_output(name=name, autoreset=True, virtual=True)
 
-    def __send_message(self, msg: 'Message'):
+    def __send_message(self, msg: 'Message', verbose: bool):
 
         """ Send **Midi** message.
         """
@@ -39,7 +41,13 @@ class Session:
 
         self.history.append(msg)
 
+        if verbose: print(msg)
         return msg
+
+    def __play_messages(self, messages, verbose):
+        for msg in messages:
+            time.sleep(msg.time)
+            self.__send_message(msg, verbose)
 
     def __message_generator(self):
 
@@ -51,6 +59,8 @@ class Session:
 
         for msg in self.midifile:
             yield msg
+
+
 
     def load(self, filepathstr: str):
 
