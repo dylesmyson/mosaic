@@ -4,12 +4,13 @@
 
 from sys import argv
 
-from mosaic.lib import *
+from lib import *
 
 
 
 if __name__ == '__main__':
-    filepathstr = str(argv[1]) if len(argv) > 1 else 'mosaic/example/mid/foo.mid'
+
+    filepathstr = str(argv[1]) if len(argv) > 1 else 'data/mid/demo.mid'
 
     session  = Session()
     print("Session connected!")

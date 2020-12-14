@@ -1,8 +1,0 @@
-meta:
-  authors:
-    - "vince"
-
-data:
-  pitch:
-    dimensions: [1, 1]
-    values: [ 'C_4' ]

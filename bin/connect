@@ -4,7 +4,7 @@
 
 from sys import argv
 
-from mosaic.lib import Session
+from lib import *
 
 
 
