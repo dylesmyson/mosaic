@@ -1,0 +1,14 @@
+steps: 10
+author: 'mosaic'
+algorithm: 'algebraic'
+filename: 'algebraic.mid'
+
+dimensions:
+  pitch: [2,2]
+  velocity: [2,2]
+  rhythm: [2,2]
+
+values:
+  pitch: [ 60, 57, 64, 67] # Am7 chord
+  velocity: [ 64, 32 ]
+  rhythm: [ 120, 300 ]
