@@ -1,7 +1,7 @@
 steps: 100
 author: 'mosaic'
 algorithm: 'markov'
-filename: 'example.mid'
+filename: 'demo.mid'
 
 values:
   pitch: [ 60, 57, 62, 67] # Am7 chord
