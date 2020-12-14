@@ -11,7 +11,7 @@ if __name__ == '__main__':
     filepathstr = argv[1] if len(argv) > 1 else 'data/yml/demo.yml'
 
     with open(filepathstr, 'r') as yaml_conf:
-        conf = yaml.load(yaml_conf)
+        conf = yaml.safe_load(yaml_conf)
 
     algorithm = getattr(Generators, conf['algorithm'])
     if algorithm:
