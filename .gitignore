@@ -2,6 +2,7 @@
 .vscode/
 
 # Ignore Midi binary examples
+*.mid
 data/mid/
 
 # Ignore Python cruft
