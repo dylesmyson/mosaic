@@ -2,7 +2,7 @@
 .vscode/
 
 # Ignore Midi binary examples
-mosaic/mid/
+mosaic/data/mid/
 
 # Ignore Python cruft
 mosaic/__pycache__/
