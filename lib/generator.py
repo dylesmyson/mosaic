@@ -1,9 +1,24 @@
-from random import choices
+from math import prod
+from random import choice, choices
+
+from lib.linear import to_matrix, operations
+from lib.definitions import Dimensions, Values, Operations, Vector, Matrix
 
 from mido import MidiFile, MidiTrack, Message
-from lib.definitions import Vector, Matrix
 
 
+
+def algebraic(dimensions: Dimensions, operations: Operations):
+
+    """ Algebraic. """
+
+    op_symbols = list(operations.keys())
+    state = to_matrix(dimensions, range(prod(dimensions)))
+
+    while True:
+        random_move = choice(op_symbols)
+        state = operations[random_move](state)
+        yield state
 
 def markov_chain(start: int, iterate_count:int, states: Vector, transition: Matrix) -> int:
 
@@ -31,9 +46,51 @@ def markov_chain(start: int, iterate_count:int, states: Vector, transition: Matr
         distr = transition[states.index(start)]
         start = choices(states, distr).pop()
         yield start
-        # yield step, start, distr 
+
 
 class Generators():
+
+    @staticmethod
+    def algebraic(conf):
+
+        """ Return a MidiFile. """
+
+        steps               = conf.get('steps', 10)
+
+        author              = conf.get('author', 'unknown')
+        filename            = conf.get('filename', 'unknown.mid')
+
+        pitch_values        = conf.get('values').get('pitch')
+        pitch_dimensions    = conf.get('dimensions').get('pitch')
+
+        velocity_values     = conf.get('values').get('velocity')
+        velocity_dimensions = conf.get('dimensions').get('velocity')
+
+        rhythm_values       = conf.get('values').get('rhythm')
+        rhythm_dimensions   = conf.get('dimensions').get('rhythm')
+
+        with MidiFile() as midifile:
+            track = MidiTrack()
+            track.append(Message('program_change', program=12, time=0))
+
+            pitch_state    = algebraic(pitch_dimensions, operations())
+            velocity_state = algebraic(velocity_dimensions, operations())
+            rhythm_state   = algebraic(rhythm_dimensions, operations())
+
+            for _ in range(steps):
+                next_pitch_state    = next(pitch_state)
+                next_velocity_state = next(velocity_state)
+                next_rhythm_state   = next(rhythm_state)
+
+                for vector in next_pitch_state:
+                    for component in vector:
+                        pitch = pitch_values[component]
+
+                        track.append(Message('note_on', note=pitch, velocity=64, time=200))
+                        track.append(Message('note_off', note=pitch, velocity=64, time=200)) 
+
+            midifile.tracks.append(track)
+            midifile.save(filename=filename)
 
     @staticmethod
     def markov(conf):
