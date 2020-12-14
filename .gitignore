@@ -2,8 +2,8 @@
 .vscode/
 
 # Ignore Midi binary examples
-mosaic/data/mid/
+data/mid/
 
 # Ignore Python cruft
-mosaic/__pycache__/
+__pycache__/
 mosaic.egg-info/
