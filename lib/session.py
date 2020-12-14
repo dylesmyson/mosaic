@@ -8,7 +8,7 @@ from mido import MidiFile, MidiTrack, open_output # pylint: disable=no-name-in-m
 
 
 class Session:
-    def __init__(self, name = 'mosaic'):
+    def __init__(self, name):
 
         """ Session wrapper.
         """
