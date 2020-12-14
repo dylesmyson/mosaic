@@ -3,7 +3,7 @@ install:
 	pip install -e $$PWD
 
 demo:
-	python3 bin/generate 'data/yml/markov/demo.yml'
+	python3 bin/generate 'data/yml/demo.yml'
 	python3 bin/player 'example.mid'
 
 test:
