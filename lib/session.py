@@ -39,6 +39,7 @@ class Session:
         return msg
 
     def __play_messages(self, messages, verbose):
+        time.sleep(2)   # Sleep to provide the receiver time to accept messages
         for msg in messages:
             try:
                 time.sleep(msg.time)
