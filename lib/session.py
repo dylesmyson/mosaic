@@ -1,10 +1,13 @@
 import time
+import logging
 
 from pathlib import Path
 from itertools import islice
 
 from mido import MidiFile, MidiTrack, open_output # pylint: disable=no-name-in-module
 
+
+logger = logging.getLogger(__name__)
 
 
 class Session:
@@ -17,6 +20,9 @@ class Session:
         self.filepath = None
         self.midifile = None
         self.outport  = self.__connect_midi_in(name)
+        logger.debug(f"Connected midi outport: {self.outport}")
+
+        logger.info(f"Connected to session as {name}.")
 
     def __connect_midi_in(self, name: str) -> 'BaseMidiOut':
 
@@ -25,31 +31,29 @@ class Session:
 
         return open_output(name=name, autoreset=True, virtual=True)
 
-    def __send_message(self, msg: 'Message', verbose: bool):
+    def __send_message(self, msg: 'Message'):
 
         """ Send **Midi** message.
         """
+
+        logger.debug(f"Sending message: {msg}")
 
         if not msg.is_meta:
             self.outport.send(msg)
 
         self.history.append(msg)
 
-        if verbose: print(msg)
         return msg
 
-    def __play_messages(self, messages, verbose):
+    def __play_messages(self, messages):
         time.sleep(2)   # Sleep to provide the receiver time to accept messages
         for msg in messages:
             try:
                 time.sleep(msg.time)
-                self.__send_message(msg, verbose)
+                self.__send_message(msg)
             except KeyboardInterrupt:
-                print('Caught interrupt. ')
+                logger.debug('Caught interrupt.')
                 break
-
-        print('Exiting. ')
-
 
     def __message_generator(self):
 
@@ -57,14 +61,14 @@ class Session:
         """
 
         if not self.midifile:
-            raise Exception('MidiFile is undefined. ')
+            raise Exception('MidiFile is undefined.')
 
         for msg in self.midifile:
             yield msg
 
     """ Intended to be public API. """
 
-    def load(self, filepathstr: str, verbose: bool = False):
+    def load(self, filepathstr: str):
 
         """ Initialize a MidiFile object.
 
@@ -72,9 +76,10 @@ class Session:
         """
 
         self.filepath = Path(filepathstr)
-        self.midifile = MidiFile(filename=str(self.filepath), debug=verbose)
+        self.midifile = MidiFile(filename=str(self.filepath))
+        logger.info(f"Loaded {self.filepath}: {self.midifile}")
 
-    def write(self, filepathstr: str, data: list, verbose: bool = False):
+    def write(self, filepathstr: str, data: list):
 
         """ Write data to MidiFile object and save to disk.
 
@@ -87,27 +92,29 @@ class Session:
             [ track.append(byte) for byte in array_bytes ]
             midifile.tracks.append(track)
             midifile.save(filename=filepathstr)
+        logger.info(f"Wrote {midifile} to {filepathstr}")
 
-    def step(self, start: int, stop: int, step: int, verbose: bool = False):
+    def step(self, start: int, stop: int, step: int):
 
         """ Step through data in MidiFile, sending each message to be played.
 
             Takes start, stop, and step data. Pass `verbose=True` for debug output.
         """
 
+        logger.debug(f"Stepping from {start} to {stop} by {step}")
         messages  = islice(self.__message_generator(), start, stop, step)
-        self.__play_messages(messages, verbose)
+        self.__play_messages(messages)
 
-    def play(self, verbose: bool = False):
+    def play(self):
 
         """ Step through all data in MidiFile, sending each message to be played.
 
             Pass `verbose=True` for debug output.
         """
 
-        self.step(0, None, step=1, verbose=verbose)
+        self.step(0, None, step=1)
 
-    def loop(self, verbose: bool = False):
+    def loop(self):
 
         """ Repeatedly step through all data in MidiFile, sending each message to be played.
             The loop can be terminated with Ctl-C.
@@ -118,9 +125,9 @@ class Session:
         while True:
             try:
                 t0 = time.time()
-                self.play(verbose=verbose)
-                print(f"looped in {time.time()-t0}s (expected {self.midifile.length})")
+                self.play()
+                logger.debug(f"Looped in {time.time()-t0} seconds (expected {self.midifile.length})")
             except KeyboardInterrupt:
-                print('Caught loop interrupt. ')
+                logger.debug('Caught loop interrupt.')
                 self.outport.reset()
                 break

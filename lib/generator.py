@@ -1,3 +1,5 @@
+import logging
+
 from math import prod
 from random import choice, choices
 
@@ -7,17 +9,23 @@ from lib.definitions import Dimensions, Values, Operations, Vector, Matrix
 from mido import MidiFile, MidiTrack, Message
 
 
+logger = logging.getLogger(__name__)
+
 
 def algebraic(dimensions: Dimensions, operations: Operations):
 
     """ Algebraic. """
 
     op_symbols = list(operations.keys())
+    logger.debug(f"Using operations {operations}")
     state = to_matrix(dimensions, range(prod(dimensions)))
+    logger.debug(f"Initial state: {state}")
 
     while True:
         random_move = choice(op_symbols)
+        logger.debug(f"Selected move {random_move}")
         state = operations[random_move](state)
+        logger.debug(f"Next state: {state}")
         yield state
 
 def markov_chain(start: int, iterate_count:int, states: Vector, transition: Matrix) -> int:
@@ -42,9 +50,15 @@ def markov_chain(start: int, iterate_count:int, states: Vector, transition: Matr
         step: 4 - trans. to 1 using dist. [0.5, 0.5]
     """
 
+    logger.debug(f"Inital State: {start}")
+    logger.debug(f"Iterate Count: {iterate_count}")
+    logger.debug(f"States: {states}")
+    logger.debug(f"Transition Matrix: {transition}")
+
     for step in range(iterate_count):
         distr = transition[states.index(start)]
         start = choices(states, distr).pop()
+        logger.debug(f"Next State: {start} (by applying {distr})")
         yield start
 
 
@@ -54,6 +68,8 @@ class Generators():
     def algebraic(conf):
 
         """ Return a MidiFile. """
+
+        logger.debug(f"Loading conf: {conf}")
 
         steps               = conf.get('steps', 10)
 
@@ -91,11 +107,14 @@ class Generators():
 
             midifile.tracks.append(track)
             midifile.save(filename=filename)
+            logger.info(f"MidiFile generated and saved to {filename}")
 
     @staticmethod
     def markov(conf):
 
         """ Return a MidiFile. """
+
+        logger.debug(f"Loaded conf {conf}")
 
         steps         = conf.get('steps', 10)
 
@@ -123,3 +142,4 @@ class Generators():
 
             midifile.tracks.append(track)
             midifile.save(filename=filename)
+            logger.info(f"MidiFile generated and saved to {filename}")
