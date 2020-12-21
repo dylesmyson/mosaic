@@ -6,8 +6,8 @@ clean:
 	rm -i *.mid
 
 demo:
-	python3 bin/generate 'data/yml/demo.yml'
-	python3 bin/player 'demo.mid'
+	./bin/mosaic generate 'data/yml/demo.yml'
+	./bin/mosaic play 'demo.mid'
 
 test:
 	python3 -m unittest discover
